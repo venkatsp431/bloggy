@@ -9,7 +9,7 @@ function App() {
   const [blogs, setBlogs] = useState([]);
   useEffect(() => {
     const fetchAPI = async function () {
-      const res = await fetch("http://localhost:7070/api/blogs/all");
+      const res = await fetch("https://bloggy-2gzg.onrender.com/api/blogs/all");
       const res1 = await res.json();
       if (res1.data) {
         console.log(res1.data);

@@ -57,16 +57,19 @@ const Home = ({ blogs, setBlogs }) => {
     setShowAddPostModal(false);
 
     try {
-      const response = await fetch("http://localhost:7070/api/blogs/postblog", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...blogData,
-          // Add any additional data you need to send
-        }),
-      });
+      const response = await fetch(
+        "https://bloggy-2gzg.onrender.com/api/blogs/postblog",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...blogData,
+            // Add any additional data you need to send
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -99,7 +102,7 @@ const Home = ({ blogs, setBlogs }) => {
   const handledelete = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:7070/api/blogs/delete/${id}`,
+        `https://bloggy-2gzg.onrender.com/api/blogs/delete/${id}`,
         {
           method: "DELETE",
         }
@@ -165,7 +168,7 @@ const Home = ({ blogs, setBlogs }) => {
                   <i className="fas fa-plus"></i> Add Category
                 </Button>
               </div>
-              <div className="col-md-3">
+              {/* <div className="col-md-3">
                 <Button
                   variant="warning"
                   className="btn-block"
@@ -173,7 +176,7 @@ const Home = ({ blogs, setBlogs }) => {
                 >
                   <i className="fas fa-plus"></i> Add User
                 </Button>
-              </div>
+              </div> */}
             </div>
           </Container>
         </section>
@@ -248,18 +251,6 @@ const Home = ({ blogs, setBlogs }) => {
                       size="sm"
                       href="categories.html"
                     >
-                      View
-                    </Button>
-                  </Card.Body>
-                </Card>
-
-                <Card className="text-center bg-warning text-white mb-3">
-                  <Card.Body>
-                    <h3>Users</h3>
-                    <h4 className="display-4">
-                      <i className="fas fa-users"></i> 4
-                    </h4>
-                    <Button variant="outline-light" size="sm" href="users.html">
                       View
                     </Button>
                   </Card.Body>

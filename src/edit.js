@@ -13,7 +13,9 @@ const EditPost = ({ blogs, setBlogs }) => {
 
   useEffect(() => {
     async function getquest() {
-      const res = await fetch(`http://localhost:7070/api/blogs/question/${id}`);
+      const res = await fetch(
+        `https://bloggy-2gzg.onrender.com/api/blogs/question/${id}`
+      );
       const res1 = await res.json();
       if (res1) {
         settitle(res1.data.title);
@@ -28,13 +30,16 @@ const EditPost = ({ blogs, setBlogs }) => {
   const handleClick = async function () {
     const ques = { title, category, body };
 
-    const res = await fetch(`http://localhost:7070/api/blogs/edit/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(ques),
-      headers: {
-        "Content-type": "application/json",
-      },
-    });
+    const res = await fetch(
+      `https://bloggy-2gzg.onrender.com/api/blogs/edit/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(ques),
+        headers: {
+          "Content-type": "application/json",
+        },
+      }
+    );
     const result = await res.json();
 
     navigate("/");
