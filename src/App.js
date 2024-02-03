@@ -3,6 +3,9 @@ import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import Home from "./home";
 import EditPost from "./edit";
+import Login from "./login";
+import Signup from "./signup";
+import Users from "./users";
 import { useEffect, useState } from "react";
 
 function App() {
@@ -23,13 +26,14 @@ function App() {
       <Routes>
         <Route
           exact
-          path="/"
-          element={<Home blogs={blogs} setBlogs={setBlogs} />}
-        />
-        <Route
           path="/editpost/:id"
           element={<EditPost blogs={blogs} setBlogs={setBlogs} />}
         />
+        <Route path="/" element={<Home blogs={blogs} setBlogs={setBlogs} />} />
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/users" element={<Users />} />
       </Routes>
     </div>
   );

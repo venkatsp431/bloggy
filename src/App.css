@@ -1,34 +1,149 @@
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+@media only screen and (max-width: 1199px) {
+  .direction-column {
+    flex-direction: column;
+  }
+  .border-sidebar {
+    height: 100% !important;
+  }
+  .right-card {
+    display: none;
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.public-links {
   display: flex;
   flex-direction: column;
-  align-items: center;
+}
+.border-sidebar {
+  border-right: 1px solid rgb(195, 184, 184);
+  height: 100vh;
+  position: fixed;
+}
+.sidebar {
+  padding-top: 50px;
+  padding-right: 20px;
+}
+.base {
+  padding-top: 50px;
+}
+.question-card {
+  border: 0 !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+}
+.right-card {
+  background-color: hsl(47, 87%, 90%) !important;
+}
+.right-card .card-text {
+  font-size: 13px;
+}
+.tag-bg {
+  background-color: aliceblue;
+  color: cornflowerblue;
+  padding: 3px 5px;
+  margin: 0 3px;
+  border-radius: 5px;
+}
+a:hover {
+  text-decoration: none !important;
+}
+.body-header {
+  display: flex;
+  justify-content: space-between;
+}
+.login-form {
+  margin: 20px;
+  padding: 30px;
+  border: 2px solid white;
+}
+.background-login {
+  background: #4e73df;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
   color: white;
 }
-
-.App-link {
-  color: #61dafb;
+.loginstyles {
+  width: 600px;
+  height: 100%;
+  margin: 100px auto;
 }
+.loginstyles h3 {
+  color: #fff;
+  text-align: center;
+}
+form {
+  background-color: #fff;
+}
+.answer-button {
+  margin-top: 70px;
+}
+.answer {
+  margin-top: 40px;
+}
+.answer-header {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+}
+.answer h6 {
+  margin-bottom: 20px !important;
+}
+.code-editor {
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+.views-data p {
+  margin-bottom: 5px;
+}
+.add-question h3 {
+  margin-bottom: 25px;
+}
+.text-field {
+  margin-bottom: 35px;
+}
+.codeBase {
+  padding: 15px;
+  background-color: darkcyan;
+  color: aliceblue;
+  margin: 15px 0;
+}
+.css-3dzjca-MuiPaper-root-MuiPopover-paper-MuiMenu-paper {
+  top: 50px !important;
+}
+.users-page .card {
+  margin-bottom: 25px;
+}
+.users-page h3 {
+  margin-bottom: 25px;
+}
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+.pointer {
+  cursor: pointer;
+  margin: 15px 0;
+}
+.monaco-editor {
+  height: 150px !important;
+  margin: 20px 0;
+  background-color: burlywood;
+}
+.view-lines {
+  background-color: antiquewhite !important;
+}
+.edit-del {
+  display: flex;
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  margin: 10px 0;
+}
+.edit-del button {
+  margin: 0 15px;
+}
+.login-signup {
+  display: flex;
+  justify-content: space-between;
 }

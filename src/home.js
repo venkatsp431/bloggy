@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Navbar,
   Container,
@@ -11,6 +11,7 @@ import {
   Table,
   Col,
   Row,
+  Spinner,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Base from "./base";
@@ -44,6 +45,12 @@ const Home = ({ blogs, setBlogs }) => {
       date: "May 20 2018",
     },
   ];
+  const [categories, setCategories] = useState([
+    "Web Development",
+    "Tech Gadgets",
+    "Business",
+    "Health & Wellness",
+  ]);
   const navigate = useNavigate();
   const [showAddPostModal, setShowAddPostModal] = useState(false);
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
@@ -57,6 +64,7 @@ const Home = ({ blogs, setBlogs }) => {
     setShowAddPostModal(false);
 
     try {
+      console.log(blogData);
       const response = await fetch(
         "https://bloggy-2gzg.onrender.com/api/blogs/postblog",
         {
@@ -94,6 +102,7 @@ const Home = ({ blogs, setBlogs }) => {
   };
   const handleInputChange = (event) => {
     const { name, value } = event.target;
+    console.log(name, value);
     setBlogData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -124,12 +133,50 @@ const Home = ({ blogs, setBlogs }) => {
 
   const handleShowAddPostModal = () => setShowAddPostModal(true);
 
-  const handleCloseAddCategoryModal = () => setShowAddCategoryModal(false);
   const handleShowAddCategoryModal = () => setShowAddCategoryModal(true);
 
+  const handleCloseAddCategoryModal = () => {
+    setShowAddCategoryModal(false);
+
+    const newCategory = document.getElementById("categoryTitle").value;
+
+    setCategories((prevCategories) => [...prevCategories, newCategory]);
+  };
   const handleCloseAddUserModal = () => setShowAddUserModal(false);
   const handleShowAddUserModal = () => setShowAddUserModal(true);
+  const [userrole, setUserrole] = useState("");
+  const token = localStorage.getItem("token");
+  const [loading, setLoading] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
+  useEffect(() => {
+    async function fetchUser() {
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+      const res = await fetch(
+        "https://bloggy-2gzg.onrender.com/api/users/profile",
+        {
+          method: "GET",
+          headers: {
+            "x-auth-token": token,
+          },
+        }
+      );
+      const res1 = await res.json();
 
+      setUserrole(res1.role);
+    }
+
+    if (localStorage.getItem("token")) {
+      fetchUser();
+      setLoggedIn(true);
+      // document.querySelector(".login").textContent = user;
+    } else {
+      console.log("No token");
+      setLoading(false);
+      setLoggedIn(false);
+    }
+  }, [token]);
   return (
     <>
       <Base>
@@ -164,9 +211,15 @@ const Home = ({ blogs, setBlogs }) => {
                   variant="success"
                   className="btn-block"
                   onClick={handleShowAddCategoryModal}
+                  disabled={userrole !== "admin"}
                 >
                   <i className="fas fa-plus"></i> Add Category
                 </Button>
+                {!loading && (
+                  <small className="text-danger mx-4">
+                    Only admins can add categories.
+                  </small>
+                )}
               </div>
               {/* <div className="col-md-3">
                 <Button
@@ -180,85 +233,67 @@ const Home = ({ blogs, setBlogs }) => {
             </div>
           </Container>
         </section>
-        <section id="posts">
-          <Container>
-            <Row>
-              <Col md={9}>
-                <Card>
-                  <Card.Header>
-                    <h4>Latest Posts</h4>
-                  </Card.Header>
-                  <Table striped bordered hover>
-                    <thead className="thead-dark">
-                      <tr>
-                        <th>#</th>
-                        <th>Title</th>
-                        <th>Category</th>
-                        <th>Date</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {blogs.map((post) => (
-                        <tr key={post._id}>
-                          <td>{post.id}</td>
-                          <td>{post.title}</td>
-                          <td>{post.category}</td>
-                          <td>{post.createdAt.slice(0, 10)}</td>
-                          <td>
-                            <Button
-                              variant="secondary"
-                              onClick={() => navigate(`/editpost/${post._id}`)}
-                            >
-                              <i className="fas fa-angle-double-right"></i>{" "}
-                              Details
-                            </Button>
-                            <Button
-                              variant="danger"
-                              onClick={() => handledelete(post.id)}
-                            >
-                              <i className="fas fa-angle-double-right"></i>{" "}
-                              Delete
-                            </Button>
-                          </td>
+        {loading && (
+          <div className="text-center">
+            <Spinner animation="border" role="status">
+              <span className="sr-only">Loading...</span>
+            </Spinner>
+          </div>
+        )}
+        {!loading && (
+          <section id="posts">
+            <Container>
+              <Row>
+                <Col md={9}>
+                  <Card>
+                    <Card.Header>
+                      <h4>Latest Posts</h4>
+                    </Card.Header>
+                    <Table striped bordered hover>
+                      <thead className="thead-dark">
+                        <tr>
+                          <th>#</th>
+                          <th>Title</th>
+                          <th>Category</th>
+                          <th>Date</th>
+                          <th></th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </Card>
-              </Col>
-              <Col md={3}>
-                <Card className="text-center bg-primary text-white mb-3">
-                  <Card.Body>
-                    <h3>Posts</h3>
-                    <h4 className="display-4">
-                      <i className="fas fa-pencil-alt"></i> {posts.length}
-                    </h4>
-                    <Button variant="outline-light" size="sm" href="posts.html">
-                      View
-                    </Button>
-                  </Card.Body>
-                </Card>
-
-                <Card className="text-center bg-success text-white mb-3">
-                  <Card.Body>
-                    <h3>Categories</h3>
-                    <h4 className="display-4">
-                      <i className="fas fa-folder"></i> 4
-                    </h4>
-                    <Button
-                      variant="outline-light"
-                      size="sm"
-                      href="categories.html"
-                    >
-                      View
-                    </Button>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
-          </Container>
-        </section>
+                      </thead>
+                      <tbody>
+                        {blogs.map((post) => (
+                          <tr key={post._id}>
+                            <td>{post.id}</td>
+                            <td>{post.title}</td>
+                            <td>{post.category}</td>
+                            <td>{post.createdAt.slice(0, 10)}</td>
+                            <td>
+                              <Button
+                                variant="secondary"
+                                onClick={() =>
+                                  navigate(`/editpost/${post._id}`)
+                                }
+                              >
+                                <i className="fas fa-angle-double-right"></i>{" "}
+                                Edit
+                              </Button>
+                              <Button
+                                variant="danger"
+                                onClick={() => handledelete(post._id)}
+                              >
+                                <i className="fas fa-angle-double-right"></i>{" "}
+                                Delete
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </Card>
+                </Col>
+              </Row>
+            </Container>
+          </section>
+        )}
         {/* Add Post Modal */}
         <Modal
           show={showAddPostModal}
@@ -293,10 +328,11 @@ const Home = ({ blogs, setBlogs }) => {
                     onChange={handleInputChange}
                     name="category"
                   >
-                    <option value="">Web Development</option>
-                    <option value="">Tech Gadgets</option>
-                    <option value="">Business</option>
-                    <option value="">Health & Wellness</option>
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
                   </Form.Control>
                 </Form.Group>
                 <Form.Group>
