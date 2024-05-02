@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Navbar, Nav, NavDropdown, Container, Button } from "react-bootstrap";
+import {
+  Navbar,
+  Nav,
+  NavDropdown,
+  Container,
+  Button,
+  Badge,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 function Base({ children }) {
@@ -8,6 +15,8 @@ function Base({ children }) {
   const [username, setUsername] = useState("");
   const [userrole, setUserrole] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+
   useEffect(() => {
     async function fetchUser() {
       const res = await fetch(
@@ -20,24 +29,27 @@ function Base({ children }) {
         }
       );
       const res1 = await res.json();
+      console.log(res1);
+      setNotifications(res1.notifications);
       setUsername(res1.name);
       setUserrole(res1.role);
     }
 
     if (localStorage.getItem("token")) {
       fetchUser();
+
       setLoggedIn(true);
-      // document.querySelector(".login").textContent = user;
     } else {
       console.log("No token");
       setLoggedIn(false);
     }
   }, [token]);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
-
     navigate("/login");
   };
+
   return (
     <>
       <Navbar bg="dark" variant="dark" expand="sm" className="p-0">
@@ -47,11 +59,34 @@ function Base({ children }) {
           <Navbar.Collapse id="navbarCollapse">
             <Nav className="mr-auto">
               <Nav.Link href="#dashboard" className="px-2 active">
-                Dashboard
+                Notifications
               </Nav.Link>
             </Nav>
             {loggedIn ? (
               <Nav className="ml-auto">
+                <NavDropdown
+                  title={
+                    <>
+                      <i className="fas fa-bell"></i>
+                      {notifications?.length > 0 && (
+                        <Badge pill variant="danger">
+                          {notifications?.length}
+                        </Badge>
+                      )}
+                    </>
+                  }
+                  id="notifications-dropdown"
+                  className="mr-3"
+                >
+                  {notifications?.map((notification) => (
+                    <NavDropdown.Item
+                      key={notification?._id}
+                      href="#notifications"
+                    >
+                      {notification.message}
+                    </NavDropdown.Item>
+                  ))}
+                </NavDropdown>
                 <NavDropdown
                   title={
                     <>
@@ -60,21 +95,17 @@ function Base({ children }) {
                   }
                   id="basic-nav-dropdown"
                   className="mr-3"
-                >
-                  <NavDropdown.Item href="#profile">
-                    <i className="fas fa-user-circle"></i> Profile
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="#settings">
-                    <i className="fas fa-cog"></i> Settings
-                  </NavDropdown.Item>
-                </NavDropdown>
+                ></NavDropdown>
                 <Nav.Link href="#logout" onClick={handleLogout}>
                   <i className="fas fa-user-times"></i> Logout
                 </Nav.Link>
               </Nav>
             ) : (
               <Nav className="ml-auto">
-                <Button variant="default" onClick={() => navigate("/login")}>
+                <Button
+                  style={{ color: "white" }}
+                  onClick={() => navigate("/login")}
+                >
                   Login
                 </Button>
               </Nav>

@@ -17,34 +17,6 @@ import { useNavigate } from "react-router-dom";
 import Base from "./base";
 
 const Home = ({ blogs, setBlogs }) => {
-  const posts = [
-    {
-      id: 1,
-      title: "Post One",
-      category: "Web Development",
-      date: "May 10 2018",
-    },
-    { id: 2, title: "Post Two", category: "Tech Gadgets", date: "May 11 2018" },
-    {
-      id: 3,
-      title: "Post Three",
-      category: "Web Development",
-      date: "May 13 2018",
-    },
-    { id: 4, title: "Post Four", category: "Business", date: "May 15 2018" },
-    {
-      id: 5,
-      title: "Post Five",
-      category: "Web Development",
-      date: "May 17 2018",
-    },
-    {
-      id: 6,
-      title: "Post Six",
-      category: "Health & Wellness",
-      date: "May 20 2018",
-    },
-  ];
   const [categories, setCategories] = useState([
     "Web Development",
     "Tech Gadgets",
@@ -65,12 +37,14 @@ const Home = ({ blogs, setBlogs }) => {
 
     try {
       console.log(blogData);
+      const token = localStorage.getItem("token");
       const response = await fetch(
         "https://bloggy-2gzg.onrender.com/api/blogs/postblog",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "x-auth-token": token,
           },
           body: JSON.stringify({
             ...blogData,
@@ -108,7 +82,7 @@ const Home = ({ blogs, setBlogs }) => {
       [name]: value,
     }));
   };
-  const handledelete = async (id) => {
+  const handleDelete = async (id) => {
     try {
       const response = await fetch(
         `https://bloggy-2gzg.onrender.com/api/blogs/delete/${id}`,
@@ -147,12 +121,30 @@ const Home = ({ blogs, setBlogs }) => {
   const [userrole, setUserrole] = useState("");
   const token = localStorage.getItem("token");
   const [loading, setLoading] = useState(true);
+  const [comments, setComments] = useState({});
+  const [username, setUsername] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
+
   useEffect(() => {
-    async function fetchUser() {
-      setTimeout(() => {
+    async function fetchData() {
+      try {
+        // Fetch blogs data
+        const response = await fetch(
+          "https://bloggy-2gzg.onrender.com/api/blogs/all"
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setBlogs(data.data);
         setLoading(false);
-      }, 2000);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
+    }
+
+    async function fetchUser() {
       const res = await fetch(
         "https://bloggy-2gzg.onrender.com/api/users/profile",
         {
@@ -163,20 +155,64 @@ const Home = ({ blogs, setBlogs }) => {
         }
       );
       const res1 = await res.json();
-
+      setUsername(res1.name);
       setUserrole(res1.role);
     }
 
     if (localStorage.getItem("token")) {
       fetchUser();
       setLoggedIn(true);
-      // document.querySelector(".login").textContent = user;
     } else {
       console.log("No token");
-      setLoading(false);
       setLoggedIn(false);
     }
-  }, [token]);
+
+    fetchData();
+  }, [token, setBlogs]);
+
+  const handleCommentSubmit = async (postId, commentText) => {
+    try {
+      console.log(postId);
+      const response = await fetch(
+        `https://bloggy-2gzg.onrender.com/api/blogs/comment/${postId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+          body: JSON.stringify({ text: commentText }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      console.log(responseData);
+      const commentInput = document.getElementById(`comment_${postId}`);
+      if (commentInput) {
+        commentInput.value = "";
+      }
+      const updatedBlogs = blogs.map((blog) => {
+        if (blog._id === postId) {
+          return {
+            ...blog,
+            comments: [...blog.comments, responseData.data],
+          };
+        }
+        return blog;
+      });
+      console.log(updatedBlogs);
+      setBlogs(updatedBlogs);
+
+      // Update comments state
+    } catch (error) {
+      console.error("Error posting comment:", error);
+    }
+  };
+
   return (
     <>
       <Base>
@@ -235,9 +271,7 @@ const Home = ({ blogs, setBlogs }) => {
         </section>
         {loading && (
           <div className="text-center">
-            <Spinner animation="border" role="status">
-              <span className="sr-only">Loading...</span>
-            </Spinner>
+            <Spinner animation="border" role="status"></Spinner>
           </div>
         )}
         {!loading && (
@@ -245,50 +279,66 @@ const Home = ({ blogs, setBlogs }) => {
             <Container>
               <Row>
                 <Col md={9}>
-                  <Card>
-                    <Card.Header>
-                      <h4>Latest Posts</h4>
-                    </Card.Header>
-                    <Table striped bordered hover>
-                      <thead className="thead-dark">
-                        <tr>
-                          <th>#</th>
-                          <th>Title</th>
-                          <th>Category</th>
-                          <th>Date</th>
-                          <th></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {blogs.map((post) => (
-                          <tr key={post._id}>
-                            <td>{post.id}</td>
-                            <td>{post.title}</td>
-                            <td>{post.category}</td>
-                            <td>{post.createdAt.slice(0, 10)}</td>
-                            <td>
-                              <Button
-                                variant="secondary"
-                                onClick={() =>
-                                  navigate(`/editpost/${post._id}`)
-                                }
-                              >
-                                <i className="fas fa-angle-double-right"></i>{" "}
-                                Edit
-                              </Button>
-                              <Button
-                                variant="danger"
-                                onClick={() => handledelete(post._id)}
-                              >
-                                <i className="fas fa-angle-double-right"></i>{" "}
-                                Delete
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  </Card>
+                  {blogs.map((post) => (
+                    <Card key={post._id} className="mb-4">
+                      <Card.Body>
+                        <Card.Title>{post.title}</Card.Title>
+                        <Card.Text>{post.body}</Card.Text>
+                        <Card.Text>
+                          Posted on {new Date(post.createdAt).toDateString()}
+                        </Card.Text>
+                      </Card.Body>
+                      <Card.Footer>
+                        <Form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            const commentText = e.target.elements.comment.value;
+                            handleCommentSubmit(post._id, commentText);
+                          }}
+                        >
+                          <Form.Group controlId={`comment_${post._id}`}>
+                            <Form.Control
+                              type="text"
+                              placeholder="Add a comment..."
+                              name="comment"
+                            />
+                          </Form.Group>
+                          <Button
+                            variant="primary"
+                            type="submit"
+                            className="mt-1"
+                          >
+                            Comment
+                          </Button>
+                        </Form>
+                        {post.comments && (
+                          <div className="mt-3">
+                            <h5>Comments:</h5>
+                            <ul>
+                              {post.comments.map((comment, index) => (
+                                <li key={index}>{comment.text}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        <div className="mt-3">
+                          <Button
+                            variant="info"
+                            className="mr-2"
+                            onClick={() => navigate(`/editpost/${post._id}`)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="danger"
+                            onClick={() => handleDelete(post._id)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </Card.Footer>
+                    </Card>
+                  ))}
                 </Col>
               </Row>
             </Container>

@@ -3,7 +3,7 @@ import { Container, Row, Col, Button, Card, Form } from "react-bootstrap";
 import Base from "./base";
 import { useNavigate, useParams } from "react-router-dom";
 
-const EditPost = ({ blogs, setBlogs }) => {
+const ViewPost = ({ blogs, setBlogs }) => {
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -13,9 +13,7 @@ const EditPost = ({ blogs, setBlogs }) => {
 
   useEffect(() => {
     async function getquest() {
-      const res = await fetch(
-        `https://bloggy-2gzg.onrender.com/api/blogs/question/${id}`
-      );
+      const res = await fetch(`http://localhost:7070/api/blogs/question/${id}`);
       const res1 = await res.json();
       if (res1) {
         settitle(res1.data.title);
@@ -30,16 +28,13 @@ const EditPost = ({ blogs, setBlogs }) => {
   const handleClick = async function () {
     const ques = { title, category, body };
 
-    const res = await fetch(
-      `https://bloggy-2gzg.onrender.com/api/blogs/edit/${id}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(ques),
-        headers: {
-          "Content-type": "application/json",
-        },
-      }
-    );
+    const res = await fetch(`http://localhost:7070/api/blogs/edit/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(ques),
+      headers: {
+        "Content-type": "application/json",
+      },
+    });
     const result = await res.json();
 
     navigate("/");
@@ -64,7 +59,7 @@ const EditPost = ({ blogs, setBlogs }) => {
           <Container>
             <Row>
               <Col md={3}>
-                <Button onClick={() => navigate("/")} variant="light" block>
+                <Button href="index.html" variant="light" block>
                   <i className="fas fa-arrow-left"></i> Back To Dashboard
                 </Button>
               </Col>
@@ -146,4 +141,4 @@ const EditPost = ({ blogs, setBlogs }) => {
   );
 };
 
-export default EditPost;
+export default ViewPost;

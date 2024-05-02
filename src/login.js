@@ -44,7 +44,7 @@ export default function Login() {
       <h3 className="text-dark">Welcome Back</h3>
       <p>User Login: Username : venkat@bloggy.co and Password : venkat123</p>
       <p>
-        User Login: Username : admin@example.com and Password : adminpassword
+        Admin Login: Username : admin@example.com and Password : adminpassword
       </p>
       <Form className="login-form d-grid">
         <Form.Group className="mb-3" controlId="formBasicEmail">
